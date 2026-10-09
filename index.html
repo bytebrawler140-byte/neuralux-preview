@@ -1,17 +1,77 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEURALUX — Interactive Preview</title><link rel="stylesheet" href="styles.css">
-<style>.previewbar{position:fixed;z-index:99;top:14px;left:50%;transform:translateX(-50%);padding:9px 15px;border:1px solid #2b3040;background:#0c0f16ee;backdrop-filter:blur(12px);border-radius:999px;color:#aeb5c5;font-size:11px}.previewbar b{color:#b29dff}</style>
-</head><body><div class="previewbar"><b>NEURALUX</b>&nbsp; Interactive SaaS Preview</div><div id="root"></div>
-<script type="module">
-import React,{useState} from "https://esm.sh/react@18.3.1";
-import {createRoot} from "https://esm.sh/react-dom@18.3.1/client";
-const U={name:"Alex Morgan",plan:"pro",credits:4270};
-const history=["Create a launch strategy for an AI productivity app","Write a premium landing page structure","Analyze my SaaS growth idea"];
-function Login({go}){return <div className="auth"><div className="authCard"><div className="brand">N<span>✦</span> NEURALUX</div><h1>Build with intelligence.</h1><p className="muted">Interactive product preview.</p><form onSubmit={e=>{e.preventDefault();go()}}><input placeholder="Email" defaultValue="alex@example.com"/><input placeholder="Password" type="password" defaultValue="password123"/><button className="primary">Enter workspace →</button></form><button className="switch" onClick={go}>Continue with demo account</button></div></div>}
-function App(){const [ok,setOk]=useState(false),[tab,setTab]=useState("overview"),[prompt,setPrompt]=useState(""),[out,setOut]=useState("");if(!ok)return <Login go={()=>setOk(true)}/>;return <div className="app"><aside><div className="brand">N<span>✦</span></div><div className="sideNav">{[["overview","⌂","Overview"],["studio","✦","AI Studio"],["billing","◈","Billing"]].map(x=><button className={tab===x[0]?"active":""} onClick={()=>setTab(x[0])}>{x[1]} <span>{x[2]}</span></button>)}</div><div className="sideBottom"><div className="planMini"><small>CURRENT PLAN</small><b>PRO</b><div className="meter"><i style={{width:"82%"}}/></div><small>4,270 credits</small></div><button onClick={()=>setOk(false)}>↪ Sign out</button></div></aside><main><header><div><div className="eyebrow">AI OPERATING SYSTEM</div><h2>{tab==="overview"?"Good to see you, Alex":tab==="studio"?"AI Studio":"Plans & billing"}</h2></div><div className="avatar">A</div></header>
-{tab==="overview"&&<section><div className="hero"><div><div className="pill">● SYSTEM ONLINE</div><h1>Turn ideas into<br/><em>intelligence.</em></h1><p>One workspace for AI generation, usage intelligence and scalable automation.</p><button className="primary" onClick={()=>setTab("studio")}>Open AI Studio →</button></div><div className="orb"><div className="orbCore">✦</div><div className="ring r1"/><div className="ring r2"/><div className="ring r3"/></div></div><div className="stats"><div><small>AI CREDITS</small><strong>4,270</strong><span>available</span></div><div><small>GENERATIONS</small><strong>128</strong><span>all time</span></div><div><small>PLAN</small><strong>PRO</strong><span>active</span></div></div><div className="panel"><div className="panelHead"><b>Recent generations</b><span>LIVE</span></div>{history.map((x,i)=><div className="history"><div className="historyIcon">✦</div><div><b>{x}</b><p>AI result generated with structured recommendations and next steps…</p></div><time>Today</time></div>)}</div></section>}
-{tab==="studio"&&<section className="studio"><div className="studioTop"><div><div className="eyebrow">NEURAL ENGINE</div><h1>What will you create?</h1><p>Describe a task, idea, strategy or piece of content.</p></div><div className="creditBadge">✦ 4,270 credits</div></div><textarea value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="e.g. Build a launch strategy for an AI productivity app…"/><button className="primary generate" onClick={()=>setOut("NEURALUX demo response:\n\nI analyzed your request: \""+prompt+"\"\n\nSuggested output:\n• Clear objective\n• Structured execution plan\n• Measurable next step")}>Generate intelligence →</button>{out&&<div className="result"><div className="resultHead"><span>✦ OUTPUT</span><button onClick={()=>navigator.clipboard?.writeText(out)}>Copy</button></div><pre>{out}</pre></div>}</section>}
-{tab==="billing"&&<section className="billing"><div className="studioTop"><div><div className="eyebrow">SUBSCRIPTIONS</div><h1>Scale your intelligence.</h1><p>Choose the capacity your workflow needs.</p></div></div><div className="plans">{[["Free","$0","100"],["Pro","$29","5,000"],["Scale","$99","25,000"]].map(p=><div className={"plan "+(p[0]==="Pro"?"current":"")}><div className="planTag">{p[0]==="Pro"?"CURRENT":""}</div><h3>{p[0]}</h3><div className="price">{p[1]}<small>/mo</small></div><b>{p[2]} credits</b><div className="feature">✓ AI generation</div><div className="feature">✓ Usage analytics</div><div className="feature">✓ Priority workspace</div><button className={p[0]==="Pro"?"disabled":"primary"}>{p[0]==="Pro"?"Current plan":"Upgrade →"}</button></div>)}</div></section>}</main></div>}
-createRoot(document.getElementById("root")).render(<App/>);
-</script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEURALUX — Interactive SaaS Preview</title>
+<link rel="stylesheet" href="./styles.css">
+<style>
+.previewbar{position:fixed;z-index:99;top:12px;left:50%;transform:translateX(-50%);padding:9px 15px;border:1px solid #2b3040;background:#0c0f16ee;border-radius:999px;color:#aeb5c5;font-size:11px;white-space:nowrap}
+.previewbar b{color:#b29dff}
+</style>
+</head>
+<body>
+<div class="previewbar"><b>NEURALUX</b> · Interactive SaaS Preview</div>
+<div id="root"></div>
+<script>
+const root=document.getElementById('root');
+const state={tab:'overview',signedIn:false,prompt:'',result:''};
+const generations=[
+'Create a launch strategy for an AI productivity app',
+'Write a premium landing page structure',
+'Analyze my SaaS growth idea'
+];
+function el(tag,cls,txt){const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;}
+function btn(txt,cls,fn){const b=el('button',cls,txt);b.type='button';b.addEventListener('click',fn);return b;}
+function login(){
+ root.replaceChildren();const wrap=el('div','auth'),card=el('div','authCard');
+ card.append(el('div','brand','N ✦ NEURALUX'),el('h1','','Build with intelligence.'),el('p','muted','Interactive product preview — demo account'));
+ const form=el('form');const email=el('input');email.placeholder='Email';email.type='email';email.value='alex@example.com';
+ const pass=el('input');pass.placeholder='Password';pass.type='password';pass.value='demo12345';
+ const enter=el('button','primary','Enter workspace →');enter.type='submit';form.append(email,pass,enter);
+ form.addEventListener('submit',e=>{e.preventDefault();state.signedIn=true;render();});
+ card.append(form,btn('Continue with demo account','switch',()=>{state.signedIn=true;render();}));wrap.append(card);root.append(wrap);
+}
+function sidebar(){
+ const aside=el('aside');aside.append(el('div','brand','N ✦'));
+ const nav=el('div','sideNav');
+ [['overview','⌂','Overview'],['studio','✦','AI Studio'],['billing','◈','Billing']].forEach(([id,icon,label])=>{
+  const b=btn(icon+' '+label,state.tab===id?'active':'',()=>{state.tab=id;render();});nav.append(b);
+ });
+ aside.append(nav);const bottom=el('div','sideBottom'),mini=el('div','planMini');
+ mini.append(el('small','','CURRENT PLAN'),el('b','','PRO'));const meter=el('div','meter'),fill=el('i');fill.style.width='82%';meter.append(fill);mini.append(meter,el('small','','4,270 credits'));
+ bottom.append(mini,btn('↪ Sign out','',()=>{state.signedIn=false;login();}));aside.append(bottom);return aside;
+}
+function header(title){const h=el('header'),left=el('div');left.append(el('div','eyebrow','AI OPERATING SYSTEM'),el('h2','',title));h.append(left,el('div','avatar','A'));return h;}
+function overview(main){
+ const section=el('section'),hero=el('div','hero'),copy=el('div');
+ copy.append(el('div','pill','● SYSTEM ONLINE'),el('h1','','Turn ideas into intelligence.'),el('p','','One workspace for AI generation, usage intelligence and scalable automation.'),btn('Open AI Studio →','primary',()=>{state.tab='studio';render();}));
+ const orb=el('div','orb');orb.append(el('div','orbCore','✦'),el('div','ring r1'),el('div','ring r2'),el('div','ring r3'));hero.append(copy,orb);section.append(hero);
+ const stats=el('div','stats');[['AI CREDITS','4,270','available'],['GENERATIONS','128','all time'],['PLAN','PRO','active']].forEach(a=>{const d=el('div');d.append(el('small','',a[0]),el('strong','',a[1]),el('span','',a[2]));stats.append(d);});section.append(stats);
+ const panel=el('div','panel'),ph=el('div','panelHead');ph.append(el('b','','Recent generations'),el('span','','DEMO'));panel.append(ph);
+ generations.forEach(g=>{const row=el('div','history'),ico=el('div','historyIcon','✦'),desc=el('div');desc.append(el('b','',g),el('p','','Demo output with structured recommendations and next steps…'));row.append(ico,desc,el('time','','Today'));panel.append(row);});section.append(panel);main.append(section);
+}
+function studio(main){
+ const section=el('section','studio'),top=el('div','studioTop'),left=el('div');
+ left.append(el('div','eyebrow','NEURAL ENGINE'),el('h1','','What will you create?'),el('p','','Describe a task, idea, strategy or piece of content.'));
+ top.append(left,el('div','creditBadge','✦ 4,270 credits'));section.append(top);
+ const area=el('textarea');area.placeholder='e.g. Build a launch strategy for an AI productivity app…';area.value=state.prompt;area.addEventListener('input',e=>state.prompt=e.target.value);section.append(area);
+ section.append(btn('Generate intelligence →','primary generate',()=>{if(!state.prompt.trim()){area.focus();return;}state.result='NEURALUX DEMO RESPONSE\\n\\nI analyzed your request: “'+state.prompt+'”\\n\\nSuggested output:\\n• Clear objective\\n• Structured execution plan\\n• Measurable next step\\n\\nThis is sample preview output. Connect a real AI provider for live model responses.';render();}));
+ if(state.result){const box=el('div','result'),head=el('div','resultHead');head.append(el('span','','✦ OUTPUT'),btn('Copy','',()=>navigator.clipboard&&navigator.clipboard.writeText(state.result)));box.append(head,el('pre','',state.result));section.append(box);}
+ main.append(section);
+}
+function billing(main){
+ const section=el('section','billing'),top=el('div','studioTop'),left=el('div');
+ left.append(el('div','eyebrow','SUBSCRIPTIONS'),el('h1','','Scale your intelligence.'),el('p','','Choose the capacity your workflow needs.'));top.append(left);section.append(top);
+ const plans=el('div','plans');
+ [['Free','$0','100',['Core workspace','Usage dashboard']],['Pro','$29','5,000',['Priority generation','Advanced analytics']],['Scale','$99','25,000',['Higher limits','Priority support','Advanced controls']]].forEach(p=>{
+  const card=el('div','plan '+(p[0]==='Pro'?'current':''));card.append(el('div','planTag',p[0]==='Pro'?'CURRENT':''),el('h3','',p[0]),el('div','price',p[1]));card.lastChild.append(el('small','','/mo'));card.append(el('b','',p[2]+' credits'));p[3].forEach(f=>card.append(el('div','feature','✓ '+f)));card.append(btn(p[0]==='Pro'?'Current plan':'Preview plan','primary',()=>alert('This is a preview. Live subscription checkout is not connected.')));plans.append(card);
+ });section.append(plans);main.append(section);
+}
+function render(){
+ root.replaceChildren();if(!state.signedIn){login();return;}
+ const app=el('div','app'),main=el('main');app.append(sidebar());main.append(header(state.tab==='overview'?'Good to see you, Alex':state.tab==='studio'?'AI Studio':'Plans & billing'));
+ if(state.tab==='overview')overview(main);if(state.tab==='studio')studio(main);if(state.tab==='billing')billing(main);app.append(main);root.append(app);
+}
+render();
+</script>
+</body></html>
